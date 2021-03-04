@@ -32,7 +32,7 @@ jobs:
         with:
           asana-pat: ${{ secrets.ASANA_PAT }}
           action: 'move-section'
-          targets: '[{"projectNameRegex": "sprint", "section": "In Review"}]'
+          targets: '[{"projectNameRegex": "(S|s)print", "section": "In Review"}]'
 
   update_task_on_pr_close:
     if: ${{ github.event.pull_request.state == 'closed' }}
@@ -54,5 +54,5 @@ jobs:
         with:
           asana-pat: ${{ secrets.ASANA_PAT }}
           action: 'complete-task'
-          trigger-phrase: 'closes'
+          trigger-phrase-regex: '(c|C)loses'
           is-complete: true

@@ -2,16 +2,11 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 const asana = require('asana');
 
-const capitalize = (s) => {
-  if (typeof s !== 'string') return ''
-  return s.charAt(0).toUpperCase() + s.slice(1)
-}
-
 async function moveSection(client, taskId, targets) {
   const task = await client.tasks.findById(taskId);
 
   targets.forEach(async target => {
-    const projectNameRegex = new RegExp(`${target.projectNameRegex}|${capitalize(target.projectNameRegex)}` || target.project)
+    const projectNameRegex = new RegExp(target.projectNameRegex || target.project)
     const targetProject = task.projects.find(project => projectNameRegex.test(project.name));
     if (!targetProject) {
       core.info(`This task does not exist in "${target.project}" project`);
@@ -67,8 +62,9 @@ async function action() {
     ASANA_PAT = core.getInput('asana-pat', {required: true}),
     ACTION = core.getInput('action', {required: true}),
     TRIGGER_PHRASE = core.getInput('trigger-phrase') || '',
+    TRIGGER_PHRASE_REGEX = core.getInput('trigger-phrase-regex'),
     PULL_REQUEST = github.context.payload.pull_request,
-    REGEX_STRING = `(${TRIGGER_PHRASE}|${capitalize(TRIGGER_PHRASE)})(?:\\s*)https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+)`,
+    REGEX_STRING = `(${TRIGGER_PHRASE_REGEX || TRIGGER_PHRASE})(?:\\s*)https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+)`,
     REGEX = new RegExp(REGEX_STRING,'g')
   ;
 

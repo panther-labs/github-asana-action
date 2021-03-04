@@ -55,7 +55,7 @@ typings/
 
 # dotenv environment variables file
 .env
-
+.secrets
 # next.js build output
 .next
 .idea

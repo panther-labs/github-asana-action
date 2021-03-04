@@ -26,6 +26,10 @@ This action integrates asana with github.
 
 **Optional** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/.
 
+### `trigger-phrase-regex`
+
+**Optional** Prefix before the task i.e ASANA TASK: https://app.asana.com/1/2/3/.
+
 ### `text`
 
 **Required for `add-comment`** If any comment is provided, the action will add a comment to the specified asana task with the text.

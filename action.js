@@ -11,7 +11,8 @@ async function moveSection(client, taskId, targets) {
   const task = await client.tasks.findById(taskId);
 
   targets.forEach(async target => {
-    const targetProject = task.projects.find(project => project.name === target.project);
+    const projectNameRegex = new RegExp(`${target.projectNameRegex}|${capitalize(target.projectNameRegex)}` || target.project)
+    const targetProject = task.projects.find(project => projectNameRegex.test(project.name));
     if (!targetProject) {
       core.info(`This task does not exist in "${target.project}" project`);
       return;

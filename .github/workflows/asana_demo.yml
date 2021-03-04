@@ -32,7 +32,7 @@ jobs:
         with:
           asana-pat: ${{ secrets.ASANA_PAT }}
           action: 'move-section'
-          targets: '[{"project": "Eng Sprint: Current", "section": "In Review"}]'
+          targets: '[{"projectNameRegex": "sprint", "section": "In Review"}]'
 
   update_task_on_pr_close:
     if: ${{ github.event.pull_request.state == 'closed' }}

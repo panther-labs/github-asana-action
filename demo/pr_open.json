@@ -1,0 +1,13 @@
+{
+  "pull_request": {
+    "state": "open",
+    "html_url": "https://github.com/panther-labs",
+    "head": {
+      "ref": "sample-head-ref"
+    },
+    "body": "Some body \n Otherbody\n asana link: https://app.asana.com/0/111/222",
+    "base": {
+      "ref": "master"
+    }
+  }
+}

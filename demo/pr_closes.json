@@ -1,0 +1,14 @@
+{
+  "pull_request": {
+    "state": "closed",
+    "merged" : true,
+    "html_url": "https://github.com/panther-labs",
+    "head": {
+      "ref": "sample-head-ref"
+    },
+    "body": "Some body \n Otherbody\n asana link: Closes https://app.asana.com/0/111/222/f \n closes https://app.asana.com/0/111/333/f",
+    "base": {
+      "ref": "master"
+    }
+  }
+}

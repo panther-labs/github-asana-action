@@ -6,7 +6,7 @@
     "head": {
       "ref": "sample-head-ref"
     },
-    "body": "Some body \n Otherbody\n asana link: Closes https://app.asana.com/0/111/222/f \n closes https://app.asana.com/0/111/333/f",
+    "body": "Some body \n Otherbody\n asana link: Closes https://app.asana.com/0/1199942399745175/1200004585185703/f \n closes https://app.asana.com/0/1199942399745175/1200011428265448/f",
     "base": {
       "ref": "master"
     }

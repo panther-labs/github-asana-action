@@ -6,6 +6,7 @@ async function moveSection(client, taskId, targets) {
   const task = await client.tasks.findById(taskId);
   console.log('TASK-PROJECTS', task.projects)
   targets.forEach(async target => {
+    console.log('TARGET', target)
     const projectNameRegex = new RegExp(target.projectNameRegex || target.project)
     console.log('PROJECT NAME REGEX', projectNameRegex)
 

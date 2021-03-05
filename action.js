@@ -4,10 +4,14 @@ const asana = require('asana');
 
 async function moveSection(client, taskId, targets) {
   const task = await client.tasks.findById(taskId);
-
+  console.log('TASK-PROJECTS', task.projects)
   targets.forEach(async target => {
     const projectNameRegex = new RegExp(target.projectNameRegex || target.project)
+    console.log('PROJECT NAME REGEX', projectNameRegex)
+
+    console.log('CONDITION', task.projects.map(pr => projectNameRegex.test(pr.name)))
     const targetProject = task.projects.find(project => projectNameRegex.test(project.name));
+    console.log('targetProject', targetProject)
     if (!targetProject) {
       core.info(`This task does not exist in "${target.project}" project`);
       return;

@@ -12,7 +12,9 @@ async function moveSection(client, taskId, targets) {
       core.info(`This task does not exist in "${target.project}" project`);
       return;
     }
+    
     const sections = await client.sections.findByProject(targetProject.gid)
+    console.log('SECTIONS', sections);
     const targetSection = sections.find(section => section.name === target.section);
     if (targetSection) {
       await client.sections.addTask(targetSection.gid, { task: taskId });

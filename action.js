@@ -1,54 +1,7 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const asana = require('asana');
-
-async function moveSection(client, taskId, targets) {
-  const task = await client.tasks.findById(taskId);
-
-  targets.forEach(async target => {
-    const projectNameRegex = new RegExp(target.projectNameRegex || target.project)
-    const targetProject = task.projects.find(project => projectNameRegex.test(project.name));
-    if (!targetProject) {
-      core.info(`This task does not exist in "${target.project}" project`);
-      return;
-    }
-    const sections = await client.sections.findByProject(targetProject.gid)
-    const targetSection = sections.find(section => section.name === target.section);
-    if (targetSection) {
-      await client.sections.addTask(targetSection.gid, { task: taskId });
-      core.info(`Moved to: ${target.project}/${target.section}`);
-    } else {
-      core.error(`Asana section ${target.section} not found.`);
-    }
-  });
-}
-
-async function findComment(client, taskId, commentId) {
-  let stories;
-  try {
-    const storiesCollection = await client.tasks.stories(taskId);
-    stories = await storiesCollection.fetch(200);
-  } catch (error) {
-    throw error;
-  }
-
-  return stories.find(story => story.text.indexOf(commentId) !== -1);
-}
-
-async function addComment(client, taskId, commentId, text, isPinned) {
-  if(commentId){
-    text += '\n'+commentId+'\n';
-  }
-  try {
-    const comment = await client.tasks.addComment(taskId, {
-      text: text,
-      is_pinned: isPinned,
-    });
-    return comment;
-  } catch (error) {
-    console.error('rejecting promise', error);
-  }
-}
+const { findComment, addComment, moveSection, findTasksFromPrBody } = require('./utils');
 
 async function buildClient(asanaPAT) {
   return asana.Client.create({
@@ -63,10 +16,7 @@ async function action() {
     ACTION = core.getInput('action', {required: true}),
     TRIGGER_PHRASE = core.getInput('trigger-phrase') || '',
     TRIGGER_PHRASE_REGEX = core.getInput('trigger-phrase-regex'),
-    PULL_REQUEST = github.context.payload.pull_request,
-    REGEX_STRING = `(${TRIGGER_PHRASE_REGEX || TRIGGER_PHRASE})(?:\\s*)https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+)`,
-    REGEX = new RegExp(REGEX_STRING,'g')
-  ;
+    PULL_REQUEST = github.context.payload.pull_request;
 
   console.log('pull_request', PULL_REQUEST);
 
@@ -75,16 +25,7 @@ async function action() {
     throw new Error('client authorization failed');
   }
 
-  console.info('looking in body', PULL_REQUEST.body, 'regex', REGEX_STRING);
-  let foundAsanaTasks = [];
-  while ((parseAsanaURL = REGEX.exec(PULL_REQUEST.body)) !== null) {
-    const taskId = parseAsanaURL.groups.task;
-    if (!taskId) {
-      core.error(`Invalid Asana task URL after the trigger phrase ${TRIGGER_PHRASE}`);
-      continue;
-    }
-    foundAsanaTasks.push(taskId);
-  }
+  const foundAsanaTasks = findTasksFromPrBody(PULL_REQUEST.body, TRIGGER_PHRASE_REGEX || TRIGGER_PHRASE)
   console.info(`found ${foundAsanaTasks.length} taskIds:`, foundAsanaTasks.join(','));
 
   console.info('calling', ACTION);

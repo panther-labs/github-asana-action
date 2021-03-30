@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: set environment variables
-        run: echo "$(git rev-parse --short=7 ${{ github.sha }})" >> $SHORT_SHA
+        run: echo "SHORT_SHA=$(git rev-parse --short=7 ${{ github.sha }})" >> $GITHUB_ENV
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1

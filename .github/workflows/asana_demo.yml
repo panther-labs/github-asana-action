@@ -9,6 +9,7 @@ on:
   pull_request:
     branches:
       - master
+      - release-*
     types:
       - opened
       - closed
@@ -20,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         name: Checkout Repo
-     
+
       - uses: ./
         name: Adds a comment to the related Asana task whenever a PR has been opened
         with:
@@ -42,13 +43,29 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         name: Checkout Repo
-        
+
       - uses: ./
-        name: Adds a comment to the related Asana task when the PR is closed
+        name: For non-release branches, adds a comment to the related Asana task when the PR is closed
+        if: startsWith(github.event.pull_request.base.ref, 'release-') != true
         with:
           asana-pat: ${{ secrets.ASANA_PAT }}
           action: 'add-comment'
           text: ${{ format('A Pull Request is now closed {0}', github.event.pull_request.html_url) }}
+          is-pinned: true
+
+      - name: Read version file in release branches
+        if: startsWith(github.event.pull_request.base.ref, 'release-') == true
+        id: version
+        run: echo "::set-output name=version::$(cat demo/example_files_in_repo/VERSION)"
+
+      - uses: ./
+        name: Adds a comment to the Asana task with a version number when in release branches
+        if: startsWith(github.event.pull_request.base.ref, 'release-') == true
+        with:
+          asana-pat: ${{ secrets.ASANA_PAT }}
+          action: 'add-comment'
+          text: ${{ format('A Pull Request is now merged to {0} {1}', steps.version.outputs.version,
+                           github.event.pull_request.html_url) }}
           is-pinned: true
 
       - uses: ./

@@ -8,7 +8,7 @@
     },
     "body": "Some body \n Otherbody\n asana link: Closes https://app.asana.com/0/1201303635456279/1201332174786206/f",
     "base": {
-      "ref": "master"
+      "ref": "release-7.8.9"
     }
   }
 }

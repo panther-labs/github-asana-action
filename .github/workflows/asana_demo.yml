@@ -46,7 +46,7 @@ jobs:
 
       - uses: ./
         name: For non-release branches, adds a comment to the related Asana task when the PR is closed
-        if: startsWith(github.event.pull_request.base.ref, 'release-') != true
+        if: github.event.pull_request.base.ref == 'master'
         with:
           asana-pat: ${{ secrets.ASANA_PAT }}
           action: 'add-comment'
@@ -54,18 +54,18 @@ jobs:
           is-pinned: true
 
       - name: Read version file in release branches
-        if: startsWith(github.event.pull_request.base.ref, 'release-') == true
+        if: startsWith(github.event.pull_request.base.ref, 'release-') && github.event.pull_request.merged
         id: version
-        run: echo "::set-output name=version::$(cat demo/example_files_in_repo/VERSION)"
+        run: echo "::set-output name=version::$(cat demo/example_files_in_repo/VERSION | tr -d '\n')"
 
       - uses: ./
         name: Adds a comment to the Asana task with a version number when in release branches
-        if: startsWith(github.event.pull_request.base.ref, 'release-') == true
+        if: startsWith(github.event.pull_request.base.ref, 'release-') && github.event.pull_request.merged
         with:
           asana-pat: ${{ secrets.ASANA_PAT }}
           action: 'add-comment'
           text: ${{ format('A Pull Request is now merged to {0} {1}', steps.version.outputs.version,
-                           github.event.pull_request.html_url) }}
+            github.event.pull_request.html_url) }}
           is-pinned: true
 
       - uses: ./

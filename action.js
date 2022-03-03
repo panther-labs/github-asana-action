@@ -1,7 +1,7 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
 const asana = require('asana');
-const { findComment, addComment, moveSection, findTasksFromPrBody } = require('./utils');
+const { findComment, addComment, moveSection, findTasksFromPrBody, generateComments } = require('./utils');
 
 async function buildClient(asanaPAT) {
   return asana.Client.create({
@@ -61,6 +61,15 @@ async function action() {
         const comment = await addComment(client, taskId, commentId, htmlText, isPinned);
         comments.push(comment);
       };
+      return comments;
+    }
+    case 'link-issues': {
+      const comments = [];
+      const newComments = generateComments(PULL_REQUEST, github.context.issue)
+      for(const newComment of newComments) {
+        const comment = await addComment(client, newComment.taskId, '', newComment.text, newComment.isPinned)
+        comments.push(comment);
+      }
       return comments;
     }
     case 'remove-comment': {

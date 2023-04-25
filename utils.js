@@ -49,7 +49,7 @@ async function addComment(client, taskId, commentId, text, isPinned) {
 }
 
 function findTasksFromPrBody(body, triggerPhrase = '') {
-  const REGEX_STRING = `(${triggerPhrase})(?:\\s*)https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+)`;
+  const REGEX_STRING = `(${triggerPhrase})(:?\\s*)https:\\/\\/app.asana.com\\/(\\d+)\\/(?<project>\\d+)\\/(?<task>\\d+)`;
   const REGEX = new RegExp(REGEX_STRING,'g')
 
   console.info('looking in body', body, '\nregex', REGEX_STRING);

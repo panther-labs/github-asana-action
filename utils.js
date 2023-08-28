@@ -4,24 +4,28 @@ async function moveSection(client, taskId, targets) {
   const task = await client.tasks.findById(taskId);
 
   for (const target of targets) {
+    // Find the right project
     const projectNameRegex = new RegExp(target.projectNameRegex || target.project)
     const targetProject = task.projects.find(project => projectNameRegex.test(project.name));
-    core.info(`Discovered Project: ${targetProject.name} with ID: ${targetProject.gid}`);
     if (!targetProject) {
       core.info(`This task does not exist in "${target.project}" project`);
       continue;
     }
+    core.info(`Discovered Project: ${targetProject.name} with ID: ${targetProject.gid}`);
+    
+    // Find the right section
     const sectionNameRegex = new RegExp(target.section)
     const sections = await client.sections.findByProject(targetProject.gid)
     const targetSection = sections.find(section => sectionNameRegex.test(section.name));
+    if (!targetSection) {
+      core.info(`Could not find a section matching "${target.section}"`);
+      continue;
+    }
     core.info(`Discovered Section: ${targetSection.name} with ID: ${targetSection.gid}`);
     
-    if (targetSection && targetProject) {
-      await client.sections.addTask(targetSection.gid, { task: taskId });
-      core.info(`Moved to: ${targetProject.name}/${targetSection.name}`);
-    } else {
-      core.error(`Asana section ${target.section} not matched against any existing section.`);
-    }
+    // Move the task
+    await client.sections.addTask(targetSection.gid, { task: taskId });
+    core.info(`Moved to: ${targetProject.name}/${targetSection.name}`);
   }
 }
 
